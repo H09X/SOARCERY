@@ -1,0 +1,827 @@
+openapi: 3.0.1
+info:
+  title: GuardDuty Findings API
+  description: API for accessing GuardDuty findings stored in S3 bucket
+  version: 1.0.0
+
+paths:
+  /findings:
+    get:
+      summary: List GuardDuty findings with optional filters
+      operationId: listFindings
+      parameters:
+        - name: severity
+          in: query
+          description: Filter by severity level (high, medium, low)
+          schema:
+            type: string
+            enum: [high, medium, low]
+          required: false
+        - name: date
+          in: query
+          description: Filter by date in YYYY/MM/DD format
+          schema:
+            type: string
+            pattern: '^\d{4}/\d{2}/\d{2}$'
+          required: false
+        - name: accountId
+          in: query
+          description: Filter by AWS account ID
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: A list of findings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FindingSummary'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:DashboardFindings/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+
+  /findings/{key+}:
+    get:
+      summary: Get detailed information about a specific finding
+      operationId: getFinding
+      parameters:
+        - name: key+
+          in: path
+          description: S3 object key of the finding
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed finding information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindingDetail'
+        '404':
+          description: Finding not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:DashboardFindings/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+              
+  /reject/{key+}:
+    get:
+      summary: Reject remediation for a finding based on its S3 key
+      operationId: rejectRemediation
+      parameters:
+        - name: key+
+          in: path
+          description: S3 object key of the finding to reject remediation for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Remediation rejected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  findingId:
+                    type: string
+                    description: The ID of the finding
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:RejectRemediation/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+
+  /approve/{key+}:
+    get:
+      summary: Approve remediation for a finding based on its S3 key
+      operationId: approveRemediation
+      parameters:
+        - name: key+
+          in: path
+          description: S3 object key of the finding to approve remediation for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Remediation approved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  findingId:
+                    type: string
+                    description: The ID of the finding
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:ApproveRemediation/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+
+  /auth:
+    post:
+      summary: Authenticate user with username and password
+      operationId: authenticateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: User's username
+                password:
+                  type: string
+                  description: User's password
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token for authentication
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: User ID
+                      username:
+                        type: string
+                        description: Username
+                      roles:
+                        type: array
+                        items:
+                          type: string
+                        description: User roles
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:Authentication/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+              
+  /finding/{accountId}:
+    get:
+      summary: Get all findings for a specific AWS account ID
+      operationId: getAccountFindings
+      parameters:
+        - name: accountId
+          in: path
+          description: AWS account ID to filter findings
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of findings for the specified account
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FindingSummary'
+        '404':
+          description: No findings found for account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:DashboardFindings/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+
+  /generate/{accountid+}:
+    get:
+      summary: Generate a report for a specific AWS account ID
+      operationId: generateReport
+      parameters:
+        - name: accountid+
+          in: path
+          description: AWS account ID to generate report for
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Report generation successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  reportUrl:
+                    type: string
+                    description: URL to download the generated report
+                  accountid:
+                    type: string
+                    description: AWS account ID for which the report was generated
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:GenerateReport/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+
+  /reset/{accountId+}:
+    post:
+      summary: Reset password for a specific account
+      operationId: resetPassword
+      parameters:
+        - name: accountId+
+          in: path
+          description: AWS account ID for password reset
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  description: Current password
+                newPassword:
+                  type: string
+                  description: New password
+              required:
+                - currentPassword
+                - newPassword
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  accountId:
+                    type: string
+                    description: Account ID for which password was reset
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:306011031356:function:Authentication/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+    options:
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: CORS headers
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content: {}
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: '{}'
+
+components:
+  schemas:
+    FindingSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the finding
+        title:
+          type: string
+          description: Finding title
+        severity:
+          type: string
+          enum: [high, medium, low]
+          description: Severity level of the finding
+        type:
+          type: string
+          description: Type of the finding
+        accountId:
+          type: string
+          description: AWS account ID where the finding was detected
+        region:
+          type: string
+          description: AWS region where the finding was detected
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the finding was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the finding was last updated
+        resourceType:
+          type: string
+          description: Type of the affected resource
+        resourceId:
+          type: string
+          description: ID of the affected resource
+        s3Key:
+          type: string
+          description: S3 object key of the full finding details
+        remediationStatus:
+          type: string
+          enum: [pending, approved, rejected]
+          description: Status of remediation for this finding
+      required:
+        - id
+        - title
+        - severity
+        - type
+        - accountId
+        - createdAt
+        - s3Key
+
+    FindingDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the finding
+        title:
+          type: string
+          description: Finding title
+        description:
+          type: string
+          description: Detailed description of the finding
+        severity:
+          type: string
+          enum: [high, medium, low]
+          description: Severity level of the finding
+        type:
+          type: string
+          description: Type of the finding
+        accountId:
+          type: string
+          description: AWS account ID where the finding was detected
+        region:
+          type: string
+          description: AWS region where the finding was detected
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the finding was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the finding was last updated
+        resourceType:
+          type: string
+          description: Type of the affected resource
+        resourceId:
+          type: string
+          description: ID of the affected resource
+        resourceTags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Tags associated with the affected resource
+        serviceName:
+          type: string
+          description: AWS service where the finding was detected
+        eventFirstSeen:
+          type: string
+          format: date-time
+          description: Timestamp when the event was first seen
+        eventLastSeen:
+          type: string
+          format: date-time
+          description: Timestamp when the event was last seen
+        count:
+          type: integer
+          description: Number of occurrences of this finding
+        action:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of action that triggered the finding
+            awsApiCallAction:
+              type: object
+              properties:
+                api:
+                  type: string
+                  description: The API call that triggered the finding
+                serviceName:
+                  type: string
+                  description: The service that was called
+                callerType:
+                  type: string
+                  description: Type of caller that made the API call
+                remoteIpDetails:
+                  type: object
+                  properties:
+                    ipAddressV4:
+                      type: string
+                      description: IPv4 address of the caller
+                    organization:
+                      type: object
+                      properties:
+                        asn:
+                          type: string
+                          description: ASN of the organization
+                        asnOrg:
+                          type: string
+                          description: Organization name
+                        isp:
+                          type: string
+                          description: ISP name
+                        org:
+                          type: string
+                          description: Organization name
+                    country:
+                      type: object
+                      properties:
+                        countryName:
+                          type: string
+                          description: Country name
+          description: Details about the action that triggered the finding
+        remediationRecommendation:
+          type: object
+          properties:
+            text:
+              type: string
+              description: Recommendation text for remediation
+            url:
+              type: string
+              description: URL with more information about remediation
+          description: Recommendations for remediating the finding
+        remediationStatus:
+          type: string
+          enum: [pending, approved, rejected]
+          description: Status of remediation for this finding
+        s3Key:
+          type: string
+          description: S3 object key of the full finding details
+      required:
+        - id
+        - title
+        - description
+        - severity
+        - type
+        - accountId
+        - createdAt
+        - s3Key
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+      required:
+        - code
+        - message
