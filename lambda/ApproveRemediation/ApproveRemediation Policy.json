@@ -1,0 +1,71 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "LambdaBasicExecution",
+			"Effect": "Allow",
+			"Action": [
+				"logs:CreateLogGroup",
+				"logs:CreateLogStream",
+				"logs:PutLogEvents"
+			],
+			"Resource": "arn:aws:logs:*:*:*"
+		},
+		{
+			"Sid": "S3FindingsAccess",
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject",
+				"s3:PutObject",
+				"s3:ListBucket"
+			],
+			"Resource": [
+				"arn:aws:s3:::soarcery",
+				"arn:aws:s3:::soarcery/*"
+			]
+		},
+		{
+			"Sid": "OrganizationsAccess",
+			"Effect": "Allow",
+			"Action": [
+				"organizations:ListAccounts",
+				"organizations:DescribeOrganization"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "AssumeRemediationRole",
+			"Effect": "Allow",
+			"Action": "sts:AssumeRole",
+			"Resource": "arn:aws:iam::*:role/SecurityHubRemediationRole"
+		},
+		{
+			"Sid": "SecurityHubAccess",
+			"Effect": "Allow",
+			"Action": [
+				"securityhub:GetFindings",
+				"securityhub:UpdateFindings"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "LocalEC2Access",
+			"Effect": "Allow",
+			"Action": [
+				"ec2:DescribeInstances",
+				"ec2:DescribeSecurityGroups",
+				"ec2:DescribeVpcs"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "LocalSSMAccess",
+			"Effect": "Allow",
+			"Action": [
+				"ssm:DescribeInstanceInformation",
+				"ssm:GetCommandInvocation"
+			],
+			"Resource": "*"
+		}
+	]
+}
