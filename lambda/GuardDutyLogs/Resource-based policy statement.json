@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Id": "default",
+  "Statement": [
+    {
+      "Sid": "EventBridgeInvocation",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "events.amazonaws.com"
+      },
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:eu-north-1:306011031356:function:GuardDutyLogs",
+      "Condition": {
+        "ArnLike": {
+          "AWS:SourceArn": "arn:aws:events:eu-north-1:306011031356:rule/HubToBucket"
+        }
+      }
+    }
+  ]
+}
