@@ -1,0 +1,23 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CloudFormation template for EventBridge RuleHubToBucket",
+  "Resources": {
+    "Rule29a94875": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Name": "HubToBucket",
+        "EventPattern": "{\"source\":[\"aws.securityhub\"],\"detail-type\":[\"Security Hub Findings - Imported\"]}",
+        "State": "ENABLED",
+        "EventBusName": "default",
+        "Targets": [{
+          "Id": "Id79b87778-0d9e-41cd-9dfe-475cb1e375c5",
+          "Arn": {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:GuardDutyLogs"
+          },
+          "RoleArn": "arn:aws:iam::306011031356:role/service-role/Amazon_EventBridge_Invoke_Lambda_170639989"
+        }]
+      }
+    }
+  },
+  "Parameters": {}
+}
