@@ -427,7 +427,7 @@ Summary:
 
 Please review the attached PDF report for detailed findings and recommendations.
 
-If you have any questions about this report, please contact our security team at security-support@soarcery.com.
+If you have any questions about this report, please contact our security team at support@soarcery.com.
 
 Best regards,
 The Soarcery Security Team
@@ -515,7 +515,7 @@ The Soarcery Security Team
         
         <p>Please review the attached PDF report for detailed findings and recommendations.</p>
         
-        <p>If you have any questions about this report, please contact our security team at <a href="mailto:security-support@soarcery.com">security-support@soarcery.com</a>.</p>
+        <p>If you have any questions about this report, please contact our security team at <a href="mailto:support@soarcery.com">support@soarcery.com</a>.</p>
         
         <p>Best regards,<br>
         The Soarcery Security Team</p>
