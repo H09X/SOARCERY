@@ -1,0 +1,48 @@
+{
+  "Version": "2012-10-17",
+  "Id": "default",
+  "Statement": [
+    {
+      "Sid": "apigateway-permission",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:eu-north-1:306011031356:function:DashboardFindings",
+      "Condition": {
+        "ArnLike": {
+          "AWS:SourceArn": "arn:aws:execute-api:eu-north-1:306011031356:j52fqymx12/*/GET/findings"
+        }
+      }
+    },
+    {
+      "Sid": "specific_event",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:eu-north-1:306011031356:function:DashboardFindings",
+      "Condition": {
+        "ArnLike": {
+          "AWS:SourceArn": "arn:aws:execute-api:eu-north-1:306011031356:j52fqymx12/*/GET/findings/{key+}"
+        }
+      }
+    },
+    {
+      "Sid": "AccountEvents",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:eu-north-1:306011031356:function:DashboardFindings",
+      "Condition": {
+        "ArnLike": {
+          "AWS:SourceArn": "arn:aws:execute-api:eu-north-1:306011031356:j52fqymx12/*/GET/finding/{accountId}"
+        }
+      }
+    }
+  ]
+}
