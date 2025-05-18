@@ -1,0 +1,68 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "LambdaBasicExecution",
+			"Effect": "Allow",
+			"Action": [
+				"logs:CreateLogGroup",
+				"logs:CreateLogStream",
+				"logs:PutLogEvents"
+			],
+			"Resource": "arn:aws:logs:*:*:*"
+		},
+		{
+			"Sid": "SecretsManagerAccess",
+			"Effect": "Allow",
+			"Action": [
+				"secretsmanager:GetSecretValue"
+			],
+			"Resource": "arn:aws:secretsmanager:*:*:secret:soarcery/ec2-credentials-*"
+		},
+		{
+			"Sid": "S3AccessForFindings",
+			"Effect": "Allow",
+			"Action": [
+				"s3:ListBucket",
+				"s3:GetObject"
+			],
+			"Resource": [
+				"arn:aws:s3:::soarcery",
+				"arn:aws:s3:::soarcery/*"
+			]
+		},
+		{
+			"Sid": "S3AccessForReports",
+			"Effect": "Allow",
+			"Action": [
+				"s3:PutObject"
+			],
+			"Resource": "arn:aws:s3:::soarcery-emails/*"
+		},
+		{
+			"Sid": "OrganizationsReadAccess",
+			"Effect": "Allow",
+			"Action": [
+				"organizations:DescribeAccount"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "SSMParameterAccess",
+			"Effect": "Allow",
+			"Action": [
+				"ssm:GetParameter"
+			],
+			"Resource": "arn:aws:ssm:*:*:parameter/soarcery/account-emails/*"
+		},
+		{
+			"Sid": "SESEmailSending",
+			"Effect": "Allow",
+			"Action": [
+				"ses:SendRawEmail",
+				"ses:SendEmail"
+			],
+			"Resource": "*"
+		}
+	]
+}
