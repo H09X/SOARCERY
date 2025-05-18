@@ -1,0 +1,59 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"logs:CreateLogGroup",
+				"logs:CreateLogStream",
+				"logs:PutLogEvents"
+			],
+			"Resource": "arn:aws:logs:*:*:*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject",
+				"s3:PutObject",
+				"s3:ListBucket"
+			],
+			"Resource": [
+				"arn:aws:s3:::soarcery",
+				"arn:aws:s3:::soarcery/*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:DescribeInstances",
+				"ec2:DescribeSecurityGroups",
+				"ec2:CreateSecurityGroup",
+				"ec2:AuthorizeSecurityGroupEgress",
+				"ec2:AuthorizeSecurityGroupIngress",
+				"ec2:RevokeSecurityGroupIngress",
+				"ec2:ModifyInstanceAttribute"
+			],
+			"Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"iam:GetUser",
+				"iam:ListAccessKeys",
+				"iam:UpdateAccessKey",
+				"iam:PutUserPolicy",
+				"iam:TagUser"
+			],
+			"Resource": "arn:aws:iam::*:user/*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"guardduty:GetFindings",
+				"securityhub:GetFindings",
+				"kinesis:GetRecords"
+			],
+			"Resource": "*"
+		}
+	]
+}
