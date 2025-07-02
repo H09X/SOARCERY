@@ -115,37 +115,6 @@ Reject remediation for a finding
 curl -X GET "https://your-api-url/reject/2024/01/15/finding-12345.json"
 ```
 
-## API Response Examples
-
-### Findings List Response
-```json
-[
-  {
-    "id": "finding-12345",
-    "title": "Unusual API call from suspicious IP",
-    "severity": "high",
-    "type": "UnauthorizedAPICall",
-    "accountId": "123456789012",
-    "region": "eu-north-1",
-    "createdAt": "2024-01-15T10:30:00Z",
-    "s3Key": "2024/01/15/finding-12345.json",
-    "remediationStatus": "pending"
-  }
-]
-```
-
-### Authentication Response
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "user-123",
-    "username": "security-analyst",
-    "roles": ["analyst", "approver"]
-  }
-}
-```
-
 ## Troubleshooting
 
 ### Common Issues
