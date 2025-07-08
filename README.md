@@ -1,4 +1,5 @@
-# SOARCERY - by Mohammad Alsaadi, Nabeel Mazyed, and Saleh Huneidi
+# SOARCERY
+by Mohammad Alsaadi, Nabeel Mazyed, and Saleh Huneidi
 
 SOARCERY is a comprehensive AWS-based security orchestration, automation, and response platform designed to monitor, analyze, and automatically remediate security threats across AWS environments. The platform integrates with AWS GuardDuty, Security Hub, and other AWS services to provide real-time threat detection and automated incident response.
 
