@@ -1,124 +1,177 @@
 # SOARCERY - by Mohammad Alsaadi, Nabeel Mazyed, and Saleh Huneidi
 
-## Project Description
+SOARCERY is a comprehensive AWS-based security orchestration, automation, and response platform designed to monitor, analyze, and automatically remediate security threats across AWS environments. The platform integrates with AWS GuardDuty, Security Hub, and other AWS services to provide real-time threat detection and automated incident response.
 
-Developed a cutting-edge Cloud-Based Security Orchestration, Automation, and Response (SOAR) Platform leveraging AWS. The solution aims to enhance cloud infrastructure security through advanced threat detection and automated response mechanisms. The project creates a scalable, proactive security system that minimizes manual intervention, demonstrating the practical application of cloud technologies in addressing modern cybersecurity challenges.
+## Architecture Overview
 
-## Main Features
+SOARCERY consists of three main components:
 
-### Dashboard Features
-- **Real-time Security Monitoring**: View and monitor GuardDuty findings across multiple AWS accounts
-- **Advanced Filtering**: Filter findings by severity level (high, medium, low), date, and AWS account ID
-- **Detailed Finding Analysis**: Access comprehensive information about each security finding
-- **Remediation Workflow**: Approve or reject remediation actions with audit trail
-- **Report Generation**: Generate detailed security reports for specific AWS accounts
-- **User Authentication**: Secure login system with role-based access control
-- **Password Management**: Built-in password reset functionality
+### 1. **Dashboard** (Frontend)
+- **Technology**: React + TypeScript + Vite
+- **UI Framework**: Tailwind CSS with shadcn/ui components
+- **Features**: 
+  - Role-based access control (Admin/Client)
+  - Real-time security event monitoring
+  - Interactive charts and visualizations
+  - Event management and remediation approval
+  - Report generation interface
 
-### Backend Capabilities
-- **Automated Data Processing**: Lambda functions handle finding ingestion and processing
-- **Scalable Storage**: S3-based storage for efficient handling of large volumes of security data
-- **RESTful API**: Well-structured API endpoints for seamless frontend-backend communication
-- **Cross-Origin Support**: CORS-enabled endpoints for web application compatibility
+### 2. **API Gateway** (Backend API)
+- **Technology**: AWS API Gateway with OpenAPI 3.0 specification
+- **Authentication**: JWT-based authentication
+- **Endpoints**:
+  - `/findings` - List and filter security findings
+  - `/finding/{accountId}` - Account-specific findings
+  - `/approve/{key}` - Approve remediation actions
+  - `/reject/{key}` - Reject remediation actions
+  - `/auth` - User authentication
+  - `/generate/{accountId}` - Generate security reports
 
-## Technologies Used
+### 3. **Lambda Functions** (Backend Processing)
+- **Language**: Python 3.x
+- **Functions**:
+  - `GuardDutyLogs` - Process GuardDuty findings
+  - `DashboardFindings` - API for dashboard data
+  - `ApproveRemediation` - Handle remediation approvals
+  - `RejectRemediation` - Handle remediation rejections
+  - `Authentication` - User authentication logic
+  - `GenerateReport` - Create and email security reports
 
-### Main AWS Services
-- **AWS Lambda**: Serverless compute for backend processing
-- **Amazon API Gateway**: RESTful API management and routing
-- **Amazon S3**: Object storage for GuardDuty findings data
-- **AWS GuardDuty**: Threat detection and security monitoring
-- **AWS IAM**: Identity and access management
+## Key Features
 
-## Prerequisites
+### Security Event Processing
+- **Real-time Detection**: Automatically processes GuardDuty findings via EventBridge
+- **Threat Classification**: Categorizes threats by severity (Critical, High, Medium, Low)
+- **Automated Filtering**: Focuses on specific attack types like:
+  - Malicious IP caller detection
+  - Reverse shell execution
+  - Unauthorized access attempts
 
-Before setting up the SOAR system, ensure you have:
+### Intelligent Remediation
+- **Automatic Response**: Low and medium severity threats are automatically remediated
+- **Approval Workflow**: High and critical severity threats require manual approval
+- **Cross-Account Support**: Handles security incidents across multiple AWS accounts
+- **Remediation Actions**:
+  - Network ACL modifications to block malicious IPs
+  - Security group isolation for compromised instances
+  - Process termination for suspicious activities
+  - Instance tagging for incident tracking
 
-- **AWS Account**: Active AWS account with appropriate permissions
-- **AWS CLI**: Configured with credentials for deployment
-- **AWS SAM CLI**: For serverless application deployment (optional)
-- **GuardDuty**: Enabled in your AWS accounts for finding generation
-- **S3 Bucket**: Created for storing findings data
+### Dashboard & Reporting
+- **Admin Dashboard**: 
+  - Organization-wide security overview
+  - Client management and monitoring
+  - Pending approval queue
+  - Comprehensive analytics
+  
+- **Client Dashboard**:
+  - Account-specific security events
+  - Remediation status tracking
+  - Report generation capabilities
+  - Historical event analysis
 
-### Required AWS Permissions
-- Lambda: Create, update, and invoke functions
-- API Gateway: Create and manage APIs
-- S3: Read/write access to findings bucket
-- IAM: Create roles and policies for Lambda functions
-- GuardDuty: Read access to findings
+### Report Generation
+- **Automated Reports**: PDF security reports generated on-demand
+- **Email Delivery**: Reports automatically emailed to account administrators
+- **Multi-Account Support**: Consolidated reporting across AWS Organizations
+- **Professional Formatting**: Styled HTML emails with attached PDF reports
 
-## Setup Instructions
+## Technology Stack
 
-### 1. Deploy Lambda Functions
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for build tooling
+- **Tailwind CSS** for styling
+- **shadcn/ui** component library
+- **React Router** for navigation
+- **TanStack Query** for state management
+- **Recharts** for data visualization
 
-#### Deploy DashboardFindings Function
+### Backend
+- **AWS Lambda** (Python 3.x)
+- **AWS API Gateway** (REST API)
+- **AWS S3** for findings storage
+- **AWS Secrets Manager** for credentials
+- **AWS SES** for email delivery
+- **AWS SSM** for instance management
+- **AWS EventBridge** for event processing
 
-#### Deploy Authentication Function
+### Security & Authentication
+- **Role-based access control**
+- **AWS IAM** for service permissions
+- **Cross-account role assumption**
+- **Encrypted storage** in S3
 
-#### Deploy Remediation Functions
+## Installation & Setup
 
-### 2. Deploy API Gateway
+### Prerequisites
+- AWS CLI configured with appropriate permissions
+- Node.js 16+ for frontend development
+- Python 3.x for Lambda functions
+- AWS Organizations setup (for multi-account features)
 
-### 3. Deploy Web Dashboard
+### Dashboard Setup
+```bash
+cd Dashboard
+npm install
+npm run dev
+```
+
+### Lambda Deployment
+Each Lambda function includes:
+- Python source code
+- IAM policy documents
+- Resource-based policy statements
+
+Deploy using AWS CLI, CloudFormation, or your preferred IaC tool.
+
+### API Gateway Configuration
+- Import the OpenAPI specification from `API Gateway/Api config.yaml`
+- Configure Lambda integrations
+- Set up authentication and CORS
 
 ## Configuration
 
-## Usage Instructions
+### Environment Variables
+- `FINDINGS_BUCKET`: S3 bucket for storing security findings
+- `ORGANIZATION_ID`: AWS Organization ID for multi-account support
+- `REMEDIATION_ROLE_NAME`: IAM role for cross-account remediation
 
-### Managing Findings
-1. **View All Findings**: Access the main dashboard to see all findings
-2. **Filter Findings**: Use the filter options to narrow down results:
-   - Severity: `high`, `medium`, `low`
-   - Date: Format `YYYY/MM/DD`
-   - Account ID: Specific AWS account
-3. **View Details**: Click on any finding to see comprehensive details
-4. **Remediation Actions**:
-   - Click "Approve" to approve remediation
-   - Click "Reject" to reject remediation
+### Secrets Manager
+- `soarcery/ec2-credentials`: SSH credentials for report generation
+- `soarcery-user-{username}`: User authentication credentials
 
-### Generating Reports
-1. Navigate to the Reports section
-2. Select the desired AWS account ID
-3. Click "Generate Report"
+### Supported Attack Types
+The system currently monitors and responds to:
+- `UnauthorizedAccess:EC2/MaliciousIPCaller.Custom`
+- `TTPs/Command and Control/UnauthorizedAccess: EC2-MaliciousIPCaller.Custom`
+- `TTPs/Execution/Execution:Runtime-ReverseShell`
 
-### API Endpoints
+## Security Features
 
-#### GET /findings
-List all findings with optional filters
-```bash
-curl -X GET "https://your-api-url/findings?severity=high&date=2024/01/15"
-```
+### Threat Detection
+- **GuardDuty Integration**: Real-time threat detection
+- **Security Hub Aggregation**: Centralized finding management
+- **Custom Threat Intelligence**: Configurable attack type filtering
 
-#### GET /findings/{key+}
-Get detailed information about a specific finding
-```bash
-curl -X GET "https://your-api-url/findings/2024/01/15/finding-12345.json"
-```
+### Automated Response
+- **Network Isolation**: Automatic blocking of malicious IPs
+- **Instance Quarantine**: Security group modifications for compromised resources
+- **Process Termination**: Automated killing of suspicious processes
+- **Forensic Collection**: Gathering of system information for analysis
 
-#### POST /auth
-Authenticate user
-```bash
-curl -X POST "https://your-api-url/auth" \
-  -H "Content-Type: application/json" \
-  -d '{"username":"your-username","password":"your-password"}'
-```
+### Compliance & Audit
+- **Event Logging**: Comprehensive audit trail
+- **Remediation Tracking**: Full history of security actions
+- **Multi-Account Visibility**: Organization-wide security posture
+- **Reporting**: Regular security reports and metrics
 
-#### GET /approve/{key+}
-Approve remediation for a finding
-```bash
-curl -X GET "https://your-api-url/approve/2024/01/15/finding-12345.json"
-```
+## Data Flow
 
-#### GET /reject/{key+}
-Reject remediation for a finding
-```bash
-curl -X GET "https://your-api-url/reject/2024/01/15/finding-12345.json"
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **CORS Errors**: Ensure your API Gateway has CORS properly configured
-2. **Lambda Timeouts**: Increase timeout settings for functions processing large datasets
-3. **S3 Access Denied**: Check IAM roles and bucket policies
+1. **Detection**: GuardDuty identifies security threats
+2. **Processing**: EventBridge triggers Lambda for finding processing
+3. **Storage**: Findings stored in S3 with metadata
+4. **Classification**: Automatic severity and threat type classification
+5. **Remediation**: Automated response for low/medium threats
+6. **Approval**: Manual approval workflow for high/critical threats
+7. **Reporting**: Dashboard updates and email notifications
